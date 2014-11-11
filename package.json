@@ -1,0 +1,6 @@
+{
+  "name": "Sandbox",
+  "version": "0.1.0",
+  "author": "Brian Majewski",
+  "description" : "Sandbox to extends Casper and build tooling framework around theme. Ideally, one could take a third party theme and apply atomic mixins, such as \"Add Code Highlighting\""
+}
