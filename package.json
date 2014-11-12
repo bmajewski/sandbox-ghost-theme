@@ -2,5 +2,11 @@
   "name": "Sandbox",
   "version": "0.1.0",
   "author": "Brian Majewski",
-  "description" : "Sandbox to extends Casper and build tooling framework around theme. Ideally, one could take a third party theme and apply atomic mixins, such as \"Add Code Highlighting\""
+  "description": "Sandbox to extend Casper and build tooling framework around theme. Ideally, one could take a third party theme and apply atomic mixins, such as \"Add Code Highlighting\"",
+  "repository": "https://github.com/bmajewski/sandbox-ghost-theme.git",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-rename": "^1.2.0",
+    "run-sequence": "^1.0.1"
+  }
 }
