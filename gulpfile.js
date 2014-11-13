@@ -1,62 +1,59 @@
-var gulp = require('gulp');
-var del = require('del');
-var argv = require('yargs').argv;
+var gulp = require('gulp'),
+    sass = require('gulp-ruby-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifycss = require('gulp-minify-css'),
+    jshint = require('gulp-jshint'),
+    uglify = require('gulp-uglify'),
+    imagemin = require('gulp-imagemin'),
+    rename = require('gulp-rename'),
+    concat = require('gulp-concat'),
+    notify = require('gulp-notify'),
+    cache = require('gulp-cache'),
+    livereload = require('gulp-livereload'),
+    del = require('del');
 
-var buildDir = './build';
-var cwd = process.cwd();
-
-
-// TODO: copying recursively is not doing the right thing. genericize from concatJS below
-gulp.copy = function(src, dest) {
-  return gulp.src(src, {base: buildDir})
-    .pipe(gulp.dest(dest));
-};
-//
-//gulp.task('cleanBuild',function(cb){
-//  del(['./assets_build/js/*'], cb);
-//
-//});
-//
-//gulp.task('concatJS', function(){
-// // This just copies all files over for now
-//  gulp.copy('./assets/js/**', './assets/js' );
-//});
-//
-//gulp.task('minifyJS', ['concatJS'], function(){
-//  //
-//});
+var deployDir = '/Users/mars/ghost/content/themes/sandbox';
 
 
-//
-//gulp.task('cleanDeploy', function(cb) {
-//  del([buildDir + '/*'], {force: true}, cb);
-//});
-//
-//gulp.task('deploy', ['cleanDeploy'], function() {
-//  ['./package.json',
-//    './*.hbs',
-//    './assets/**/*',
-//    './partials/**/*']
-//    .map(function(src) {
-//      gulp.copy(src, buildDir)
-//    });
-//});
-
-gulp.task('concatJS', function(){
-  gulp.src('./assets/js/**').pipe(gulp.dest('./build/assets/js'));
+gulp.task('scripts', function () {
+    return gulp.src('assets/js/**/*.js')
+        //.pipe(jshint('.jshintrc'))
+        //.pipe(jshint.reporter('default'))
+        .pipe(concat('sandbox.js'))
+        .pipe(gulp.dest('build/assets/js'))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(uglify())
+        .pipe(gulp.dest('build/assets/js'))
+        .pipe(notify({message: 'Scripts task complete'}));
 });
 
-gulp.task('minifyJS', ['concatJS'], function(){
-  //
+gulp.task('styles', function () {
+    return gulp.src('assets/css/*.css')
+        .pipe(concat('sandbox.css'))
+        .pipe(gulp.dest('build/assets/css'))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(minifycss())
+        .pipe(gulp.dest('build/assets/css'))
+        .pipe(notify({message: 'Styles task complete'}));
 });
 
-gulp.task('cleanBuild', function(cb){
-  del(buildDir + '/*', cb);
+gulp.task('default', function () {
+    console.log('Not very interesting');
+    console.log(cwd);
 });
 
-gulp.task('default', function() {
-  console.log('Not very interesting');
-  console.log(cwd);
+gulp.task('clean', function (cb) {
+    del('./build', cb);
 });
 
-gulp.task('build', ['cleanBuild', 'minifyJS']);
+gulp.task('deploy', function (cb) {
+    del('/Users/mars/ghost/content/themes/sandbox/*', {force: true}, function () {
+        gulp.src('./build/**', {base: 'build'}).pipe(gulp.dest(deployDir));
+        gulp.src('./partials/**',{base:'.'}).pipe(gulp.dest(deployDir));
+        gulp.src('./assets/fonts/**', {base:'fonts'}).pipe(gulp.dest(deployDir + '/assets'));
+        gulp.src('package.json').pipe(gulp.dest(deployDir));
+        gulp.src('*.hbs').pipe(gulp.dest(deployDir));
+    });
+});
+
+gulp.task('build', ['scripts', 'styles']);
